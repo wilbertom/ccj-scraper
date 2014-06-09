@@ -1,6 +1,23 @@
+"""
+inmate_details.py
 
+The InmateDetails class is responsible for extracting and cleaning
+data given an html page. From the html it will parse the
+age at booking, next court date ect ect. From the fields it also
+can create a hash for the Inmate.
+
+This is a standalone class, it only has PyQuery as a requirement
+it's standalone in the sense that you can do:
+
+i = InmateDetails(request.get(inmate_page_url))
+
+and then do whatever with the data. This class will not try to save,
+and the only parsing of the raw data it does is remove leading
+whitespace.
+
+"""
 from datetime import datetime
-from pyquery import PyQuery as pq
+from pyquery import PyQuery
 import hashlib
 
 
@@ -16,7 +33,7 @@ class InmateDetails:
     """
 
     def __init__(self, html):
-        inmate_doc = pq(html)
+        inmate_doc = PyQuery(html)
         self.__columns = inmate_doc('table tr:nth-child(2n) td')
 
     def age_at_booking(self):

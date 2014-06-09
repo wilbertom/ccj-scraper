@@ -19,9 +19,10 @@ whitespace.
 from datetime import datetime
 from pyquery import PyQuery
 import hashlib
+from inmate_data import InmateData
 
 
-class InmateDetails:
+class InmateDetails(InmateData):
     """
     Handles the processing of the Inmate Detail information page on the
     Cook County Jail website.
@@ -33,31 +34,10 @@ class InmateDetails:
     """
 
     def __init__(self, html):
+        super(InmateDetails, self).__init__()
+
         inmate_doc = PyQuery(html)
         self.__columns = inmate_doc('table tr:nth-child(2n) td')
-
-    def age_at_booking(self):
-        """
-        Calculates the inmates age at the time of booking,
-        code taken from http://is.gd/ep7Thb
-        """
-        birth_date, booking_date = self._birth_date(), self.booking_date()
-        if (birth_date.month <= booking_date.month and
-                birth_date.day <= booking_date.day):
-            return booking_date.year - birth_date.year
-        return booking_date.year - birth_date.year - 1
-
-    def bail_amount(self):
-        return self._column_content(10)
-
-    def _birth_date(self):
-        return self.__convert_datetime(2)
-
-    def booking_date(self):
-        return self.__convert_date(7)
-
-    def charges(self):
-        return self._column_content(11)
 
     def _column_content(self, columns_index):
         return self.__columns[columns_index].text_content().strip()
@@ -74,13 +54,13 @@ class InmateDetails:
             result = None
         return result
 
-    def court_house_location(self):
-        return self._column_content(13)
+    def _birth_date(self):
+        return self.__convert_datetime(2)
 
-    def gender(self):
-        return self._column_content(4)
+    def _name(self):
+        return self._column_content(1)
 
-    def hash_id(self):
+    def _hash_id(self):
         id_string = "%s%s%s%s" % (
             self._name().replace(" ", ""),
             self._birth_date().strftime('%m%d%Y'),
@@ -90,23 +70,58 @@ class InmateDetails:
         byte_string = id_string.encode('utf-8')
         return hashlib.sha256(byte_string).hexdigest()
 
-    def height(self):
-        return self._column_content(5)
+    def _court_house_location(self):
+        return self._column_content(13)
 
-    def housing_location(self):
-        return self._column_content(8)
-
-    def jail_id(self):
+    def _jail_id(self):
         return self._column_content(0)
 
-    def _name(self):
-        return self._column_content(1)
-
-    def next_court_date(self):
+    def _next_court_date(self):
         return self.__convert_datetime(12)
+
+    def booking_id(self):
+        return self._jail_id()
+
+    def booking_date(self):
+        return self.__convert_date(7)
+
+    def inmate_hash(self):
+        return self._hash_id()
+
+    def gender(self):
+        return self._column_content(4)
 
     def race(self):
         return self._column_content(3)
 
+    def height(self):
+        return self._column_content(5)
+
     def weight(self):
         return self._column_content(6)
+
+    def age_at_booking(self):
+        """
+        Calculates the inmates age at the time of booking,
+        code taken from http://is.gd/ep7Thb
+        """
+        birth_date, booking_date = self._birth_date(), self.booking_date()
+        if (birth_date.month <= booking_date.month and
+                birth_date.day <= booking_date.day):
+            return booking_date.year - birth_date.year
+        return booking_date.year - birth_date.year - 1
+
+    def housing_location(self):
+        return self._column_content(8)
+
+    def charges(self):
+        return self._column_content(11)
+
+    def bail_amount(self):
+        return self._column_content(10)
+
+    def court_date(self):
+        return self._next_court_date()
+
+    def court_location(self):
+        return self._court_house_location()

@@ -20,7 +20,7 @@ class Inmate:
 
     @staticmethod
     def active_inmates():
-        raise NotImplementedError('active_inmates needs to be implemented with the new format')
+        raise NotImplementedError('needs to be implemented with the new format')
 
     def _clear_discharged(self):
         """
@@ -28,12 +28,14 @@ class Inmate:
         function clears the discharge fields, so the inmate is no longer classified as being discharged.
         @return True if resurrecting inmate
         """
-        resurrected = self._inmate.discharge_date_earliest is not None
-        if resurrected:
-            self._inmate.discharge_date_earliest = None
-            self._inmate.discharge_date_latest = None
-            self._inmate.in_jail = self._inmate.housing_history.latest().housing_location.in_jail
-        return resurrected
+
+        # resurrected = self._inmate.discharge_date_earliest is not None
+        # if resurrected:
+        #     self._inmate.discharge_date_earliest = None
+        #     self._inmate.discharge_date_latest = None
+        #     self._inmate.in_jail = self._inmate.housing_history.latest().housing_location.in_jail
+        # return resurrected
+        raise NotImplementedError('needs to be implemented with the new format')
 
     def _debug(self, msg):
         self._monitor.debug('Inmate: %s' % msg)
@@ -55,11 +57,11 @@ class Inmate:
         @param booking_date: booking date to search for
         @rtype : list of inmates booked on specified day
         """
-        raise NotImplementedError('known_inmates_for_date needs to be implemented with the new format')
+        raise NotImplementedError('needs to be implemented with the new format')
 
     @staticmethod
     def recently_discharged_inmates():
-        raise NotImplementedError('recently_discharged_inmates needs to be implemented with the new format')
+        raise NotImplementedError('needs to be implemented with the new format')
 
     def save(self):
         """
@@ -103,13 +105,13 @@ class Inmate:
         self._inmate.booking_date = self._inmate_details.booking_date()
 
     def _store_charges(self):
-        raise NotImplementedError('needs to be implemented with the new format')
+        self._inmate.charge = self._inmate_details.charges()
 
     def _store_housing_location(self):
-        raise NotImplementedError('needs to be implemented with the new format')
+        self._inmate.housing_location = self._inmate_details.housing_location()
 
     def _store_next_court_info(self):
-        raise NotImplementedError('needs to be implemented with the new format')
+        self._inmate.court_info = self._inmate_details.next_court_date()
 
     def _store_person_id(self):
         self._inmate.person_id = self._inmate_details.hash_id()
